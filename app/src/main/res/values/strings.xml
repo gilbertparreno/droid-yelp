@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">base-project</string>
+
+    <plurals name="lbl_quantity_reviews">
+        <item quantity="one">%d Review</item>
+        <item quantity="other">%d Reviews</item>
+    </plurals>
+    <string name="lbl_business_distance">%1$.2f km</string>
+    <string name="lbl_seekbar_radius">%1$d km</string>
+
+    <string name="btn_apply">Apply</string>
+    <string name="lbl_radius">Radius</string>
 </resources>

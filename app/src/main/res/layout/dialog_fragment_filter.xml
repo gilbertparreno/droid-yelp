@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="@dimen/mp_standard">
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbOpenNow"
+        style="@style/CheckboxTheme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:text="Open Now"
+        app:layout_constraintEnd_toStartOf="@id/tvOpenNowValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvOpenNowValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mp_standard"
+        android:textColor="@color/subTextColor"
+        android:textSize="@dimen/text_s"
+        app:layout_constraintBottom_toBottomOf="@+id/cbOpenNow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cbOpenNow"
+        tools:text="All" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:background="@color/bgButtonContainer"
+        app:layout_constraintTop_toBottomOf="@id/cbOpenNow" />
+
+    <TextView
+        android:id="@+id/tvRadius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:text="@string/lbl_radius"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/divider" />
+
+    <TextView
+        android:id="@+id/tvRadiusValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mp_standard"
+        android:textColor="@color/subTextColor"
+        android:textSize="@dimen/text_s"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRadius"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvRadius"
+        tools:text="10 km" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/sbDistance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginEnd="@dimen/mp_standard"
+        android:max="40"
+        android:min="1"
+        android:progress="10"
+        android:theme="@style/WidgetTheme"
+        app:layout_constraintTop_toBottomOf="@id/tvRadius" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:background="@color/bgButtonContainer"
+        app:layout_constraintTop_toBottomOf="@id/sbDistance">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:id="@+id/btnApply"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/mp_double"
+            android:layout_marginTop="@dimen/mp_double"
+            android:layout_marginEnd="@dimen/mp_double"
+            android:layout_marginBottom="@dimen/mp_standard"
+            android:text="@string/btn_apply"
+            android:textSize="@dimen/text_s" />
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

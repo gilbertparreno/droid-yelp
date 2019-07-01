@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/mp_24dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgBusiness"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginEnd="@dimen/mp_standard"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@android:color/black" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvBusinessName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_half"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="@dimen/text_m"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/tvDistance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgBusiness"
+        tools:text="Meet Lover\'s g" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCategories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_quarter"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/subTextColor"
+        android:textSize="@dimen/text_xs"
+        app:layout_constraintEnd_toStartOf="@+id/rbRating"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvBusinessName"
+        tools:text="Food, Drinks, Alcohol" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDistance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mp_standard"
+        app:layout_constraintBottom_toBottomOf="@+id/tvBusinessName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvBusinessName"
+        tools:text="2.5 mi" />
+
+    <androidx.appcompat.widget.AppCompatRatingBar
+        android:id="@+id/rbRating"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mp_quarter"
+        android:numStars="5"
+        android:rating="4"
+        android:stepSize="1"
+        android:theme="@style/WidgetTheme"
+        app:layout_constraintBottom_toBottomOf="@+id/tvReviews"
+        app:layout_constraintEnd_toStartOf="@+id/tvReviews"
+        app:layout_constraintTop_toTopOf="@+id/tvReviews" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvReviews"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/mp_standard"
+        android:textColor="@color/subTextColor"
+        android:textSize="@dimen/text_xs"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCategories"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvCategories"
+        tools:text="10 Reviews" />
+</androidx.constraintlayout.widget.ConstraintLayout>
