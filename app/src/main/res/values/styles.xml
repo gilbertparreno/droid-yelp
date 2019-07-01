@@ -1,11 +1,40 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:fontFamily">@font/font</item>
+        <item name="android:textColor">@color/defaultTextColor</item>
+        <item name="android:textSize">@dimen/text_m</item>
+
+        <item name="buttonStyle">@style/BaseButton</item>
+    </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_dialog</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_dialog</item>
+    </style>
+
+    <style name="WidgetTheme" parent="Theme.AppCompat">
+        <item name="android:colorControlNormal">@color/subTextColor_80</item>
+        <item name="android:colorControlActivated">@color/subTextColor</item>
+    </style>
+
+    <style name="BaseButton" parent="@style/Widget.AppCompat.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/bg_btn_primary_rippled</item>
+        <item name="android:elevation">@dimen/mp_quarter</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CheckboxTheme" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_checkbox</item>
+        <item name="android:paddingLeft">@dimen/mp_half</item>
+        <item name="android:tint">@color/colorAccent</item>
     </style>
 
 </resources>
