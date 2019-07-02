@@ -10,4 +10,21 @@
 
     <string name="btn_apply">Apply</string>
     <string name="lbl_radius">Radius</string>
+    <string name="lbl_categories">Categories</string>
+
+    <string name="lbl_sort_by">Sort By</string>
+    <!-- Sort By Items -->
+    <string name="lbl_best_match">Best Match</string>
+    <string name="lbl_rating">Rating</string>
+    <string name="lbl_review_count">Review Count</string>
+    <string name="lbl_distance">Distance</string>
+
+    <string name="lbl_open_now">Open Now</string>
+
+    <string-array name="sort_alias">
+        <item>best_match</item>
+        <item>rating</item>
+        <item>review_count</item>
+        <item>distance</item>
+    </string-array>
 </resources>

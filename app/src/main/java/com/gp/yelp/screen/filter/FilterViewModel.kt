@@ -1,19 +1,23 @@
 package com.gp.yelp.screen.filter
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.gp.yelp.utils.DEFAULT_RADIUS
+import com.gp.yelp.utils.DEFAULT_SORT_BY_ALIAS
 import com.gp.yelp.utils.SharedPreferenceUtil
-import timber.log.Timber
 import javax.inject.Inject
 
 class FilterViewModel @Inject constructor(private val sharedPreferenceUtil: SharedPreferenceUtil) : ViewModel(),
     LifecycleObserver {
 
+    val liveDataRadius = MutableLiveData<Int>()
+    val liveDataOpenNow = MutableLiveData<Boolean>()
+    val liveDataSortBy = MutableLiveData<String>()
+
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
-        Timber.d("TODO: onCreate")
+        liveDataRadius.postValue(sharedPreferenceUtil.getInt(SharedPreferenceUtil.Key.RADIUS, DEFAULT_RADIUS))
+        liveDataOpenNow.postValue(sharedPreferenceUtil.getBoolean(SharedPreferenceUtil.Key.OPEN_NOW, false))
+        liveDataSortBy.postValue(sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.SORT_BY, DEFAULT_SORT_BY_ALIAS))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

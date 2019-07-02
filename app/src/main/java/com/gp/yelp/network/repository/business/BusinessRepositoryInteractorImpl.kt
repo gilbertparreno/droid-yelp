@@ -8,11 +8,11 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class BusinessRepositoryInteractorImpl @Inject constructor(private val businessService: BusinessService) :
-    BusinessRepositoryInteractor {
+        BusinessRepositoryInteractor {
 
-    override fun getBusiness(term: String, lat: Double, lng: Double): Single<Business> {
-        return businessService.searchBusiness(term, lat, lng)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+    override fun getBusiness(term: String?, lat: Double?, lng: Double?, radius: Int?, sortBy: String?, openNow: Boolean?): Single<Business> {
+        return businessService.searchBusiness(term, lat, lng, radius, sortBy, openNow)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 }

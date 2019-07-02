@@ -17,29 +17,18 @@ class BusinessAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var businessItems = mutableListOf<Business.BusinessesItem>()
 
-    fun addItems(newBsinessItems: List<Business.BusinessesItem>) {
-//        if (deliveries.isNotEmpty() && deliveries.last().id == -1) {
-//            val lastIndex = deliveries.lastIndex
-//            deliveries.removeAt(lastIndex)
-//            notifyItemRemoved(lastIndex)
-//        }
-//
-//        if (newDeliveries.isEmpty()) return
-//
+    fun addItems(newBusinessItems: List<Business.BusinessesItem>) {
         val oldSize = businessItems.size
-        businessItems.addAll(newBsinessItems)
-//        deliveries.add(Delivery())
+        businessItems.addAll(newBusinessItems)
 
         val newSize = businessItems.size
         notifyItemRangeInserted(oldSize, newSize)
     }
 
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-//        return when (viewType) {
-//            ITEM -> ItemViewHolder(parent.inflate(R.layout.item_delivery, false))
-//            else -> ProgressViewHolder(parent.inflate(R.layout.item_progress, false))
-//        }
-//    }
+    fun clearAdapter() {
+        businessItems.clear()
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ItemViewHolder(parent.inflate(R.layout.item_business, false))

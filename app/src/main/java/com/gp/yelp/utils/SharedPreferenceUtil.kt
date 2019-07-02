@@ -12,6 +12,7 @@ class SharedPreferenceUtil(context: Context) {
         companion object {
             val RADIUS = "radius"
             val OPEN_NOW = "open_now"
+            val SORT_BY = "sort_by"
         }
     }
 
@@ -31,11 +32,19 @@ class SharedPreferenceUtil(context: Context) {
         }
     }
 
-    fun getInt(key: String, defaultValue: Int) : Int {
+    fun getInt(key: String, defaultValue: Int = 0) : Int {
        return sharedPref.getInt(key, defaultValue)
     }
 
-    fun getBoolean(key: String, defaultValue: Boolean) : Boolean {
+    fun getBoolean(key: String, defaultValue: Boolean = false) : Boolean {
         return sharedPref.getBoolean(key, defaultValue)
+    }
+
+    fun getFloat(key: String, defaultValue: Float = 0f) : Float {
+        return sharedPref.getFloat(key, defaultValue)
+    }
+
+    fun getString(key: String, defaultValue: String) : String {
+        return sharedPref.getString(key, defaultValue)
     }
 }

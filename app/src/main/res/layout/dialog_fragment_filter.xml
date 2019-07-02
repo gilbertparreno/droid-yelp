@@ -4,8 +4,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:paddingTop="@dimen/mp_standard">
+    android:background="@color/bgDefault">
+
+    <include layout="@layout/toolbar" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSortBy"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:text="@string/lbl_sort_by"
+        app:layout_constraintEnd_toStartOf="@id/tvOpenNowValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarContainer" />
+
+    <RadioGroup
+        android:id="@+id/rgSortBy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_quarter"
+        android:layout_marginEnd="@dimen/mp_standard"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSortBy">
+
+        <RadioButton
+            android:id="@+id/rbBestMatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/mp_quarter"
+            android:background="@drawable/radio_flat_selector"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:text="@string/lbl_best_match"
+            android:textColor="@color/radio_flat_text_selector"
+            android:textSize="@dimen/text_s" />
+
+        <RadioButton
+            android:id="@+id/rbRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/mp_quarter"
+            android:background="@drawable/radio_flat_selector"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/lbl_rating"
+            android:textColor="@color/radio_flat_text_selector"
+            android:textSize="@dimen/text_s" />
+
+        <RadioButton
+            android:id="@+id/rbReviewCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/mp_quarter"
+            android:background="@drawable/radio_flat_selector"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/lbl_review_count"
+            android:textColor="@color/radio_flat_text_selector"
+            android:textSize="@dimen/text_s" />
+
+        <RadioButton
+            android:id="@+id/rbDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radio_flat_selector"
+            android:button="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/lbl_distance"
+            android:textColor="@color/radio_flat_text_selector"
+            android:textSize="@dimen/text_s" />
+    </RadioGroup>
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:background="@color/bgButtonContainer"
+        app:layout_constraintTop_toBottomOf="@id/rgSortBy" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/cbOpenNow"
@@ -13,10 +95,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/mp_standard"
-        android:text="Open Now"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:text="@string/lbl_open_now"
         app:layout_constraintEnd_toStartOf="@id/tvOpenNowValue"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/divider1" />
 
     <TextView
         android:id="@+id/tvOpenNowValue"
@@ -31,7 +114,7 @@
         tools:text="All" />
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/divider2"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="@dimen/mp_standard"
@@ -47,7 +130,7 @@
         android:layout_marginTop="@dimen/mp_standard"
         android:text="@string/lbl_radius"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/divider" />
+        app:layout_constraintTop_toTopOf="@id/divider2" />
 
     <TextView
         android:id="@+id/tvRadiusValue"
@@ -62,7 +145,7 @@
         tools:text="10 km" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/sbDistance"
+        android:id="@+id/sbRadius"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/mp_standard"
@@ -73,16 +156,45 @@
         android:theme="@style/WidgetTheme"
         app:layout_constraintTop_toBottomOf="@id/tvRadius" />
 
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:background="@color/bgButtonContainer"
+        app:layout_constraintTop_toBottomOf="@id/sbRadius" />
+
+    <TextView
+        android:id="@+id/tvCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_standard"
+        android:text="@string/lbl_categories"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/divider3" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mp_standard"
+        android:layout_marginTop="@dimen/mp_quarter"
+        android:layout_marginEnd="@dimen/mp_standard"
+        app:layout_constraintTop_toBottomOf="@id/tvCategories"
+        tools:listitem="@layout/item_category" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/mp_standard"
         android:background="@color/bgButtonContainer"
-        app:layout_constraintTop_toBottomOf="@id/sbDistance">
+        app:layout_constraintTop_toBottomOf="@id/rvCategories">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="match_parent"
             android:id="@+id/btnApply"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/mp_double"
             android:layout_marginTop="@dimen/mp_double"
