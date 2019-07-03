@@ -2,21 +2,22 @@ package com.gp.yelp.screen.filter
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.SeekBar
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.gp.yelp.R
 import com.gp.yelp.app.App
+import com.gp.yelp.network.model.Category
+import com.gp.yelp.screen.filter.categoryList.CategoryListFragment
+import com.gp.yelp.utils.BaseDialogFragment
 import com.gp.yelp.utils.ItemOffsetDecoration
 import com.gp.yelp.utils.SharedPreferenceUtil
 import kotlinx.android.synthetic.main.dialog_fragment_filter.*
@@ -24,7 +25,8 @@ import kotlinx.android.synthetic.main.toolbar.*
 import javax.inject.Inject
 
 
-class DialogFragmentFilter(private val filterListener: FilterListener) : DialogFragment(), CategoryAdapter.CategoryListener {
+class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDialogFragment(),
+    CategoryAdapter.CategoryListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -33,7 +35,6 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
 
     private var sortAlias = arrayOf<String>()
     private val rbSortIds = arrayOf(R.id.rbBestMatch, R.id.rbRating, R.id.rbReviewCount, R.id.rbDistance)
-
     private val adapter = CategoryAdapter(this)
 
     override fun onAttach(context: Context?) {
@@ -42,33 +43,23 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
 
         let {
             DaggerFilterComponent.builder()
-                    .appComponent((activity.application as App).appComponent)
-                    .build()
-                    .inject(this)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog.window?.setWindowAnimations(R.style.DialogAnimation)
-
-        val dialog = dialog
-        if (dialog != null) {
-            val window = dialog.window
-            if (window != null) {
-                val width = ViewGroup.LayoutParams.MATCH_PARENT
-                val height = ViewGroup.LayoutParams.WRAP_CONTENT
-                val wlp = window.attributes
-                wlp.gravity = Gravity.BOTTOM
-                window.attributes = wlp
-                window.setBackgroundDrawableResource(android.R.color.transparent)
-                window.setLayout(width, height)
-            }
+                .appComponent((activity.application as App).appComponent)
+                .build()
+                .inject(this)
         }
     }
 
     override fun addCategory() {
-        adapter.addItems("Hello World")
+        val ft = activity!!.supportFragmentManager.beginTransaction()
+        val prev = activity!!.supportFragmentManager.findFragmentByTag(CategoryListFragment.TAG)
+        if (prev != null) {
+            ft.remove(prev)
+        }
+        ft.addToBackStack(null)
+        val dialogFragment = CategoryListFragment()
+
+        dialogFragment.setTargetFragment(this, REQUEST_CATEGORY)
+        dialogFragment.show(ft, CategoryListFragment.TAG)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -81,7 +72,7 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
 
         viewModel.liveDataRadius.observe(viewLifecycleOwner, Observer {
             sbRadius.progress = it / 1000
-            tvRadiusValue.text = resources.getString(R.string.lbl_seekbar_radius, it)
+            tvRadiusValue.text = resources.getString(R.string.lbl_seekbar_radius, it / 1000)
         })
 
         viewModel.liveDataOpenNow.observe(viewLifecycleOwner, Observer {
@@ -101,8 +92,8 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
         })
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         sortAlias = resources.getStringArray(R.array.sort_alias)
         initViewModel()
@@ -159,7 +150,7 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
         rvCategories.addItemDecoration(itemDecoration)
         rvCategories.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
         rvCategories.adapter = adapter
-        adapter.addItems("")
+        adapter.addItem(Category(alias = ""))
     }
 
     private fun validateEnableButtonApply() {
@@ -181,6 +172,14 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : DialogF
     }
 
     companion object {
-        val TAG = DialogFragmentFilter.javaClass.simpleName
+        val TAG = "DialogFragmentFilter"
+        val EXTRA_CATEGORIES = "categories"
+        val REQUEST_CATEGORY = 1
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val data = data!!.getParcelableArrayListExtra<Category>(EXTRA_CATEGORIES)
+        adapter.addItems(data)
     }
 }

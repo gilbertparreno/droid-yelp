@@ -8,7 +8,8 @@
     <string name="lbl_business_distance">%1$.2f km</string>
     <string name="lbl_seekbar_radius">%1$d km</string>
 
-    <string name="btn_apply">Apply</string>
+    <string name="btn_done">Done</string>
+    <string name="btn_apply_filters">Apply Filter/s</string>
     <string name="lbl_radius">Radius</string>
     <string name="lbl_categories">Categories</string>
 
@@ -27,4 +28,7 @@
         <item>review_count</item>
         <item>distance</item>
     </string-array>
+
+    <string name="lbl_add_category">Add Category</string>
+    <string name="hint_category_search">Type anything here..</string>
 </resources>

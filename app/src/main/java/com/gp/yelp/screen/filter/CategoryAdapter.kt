@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.gp.yelp.R
+import com.gp.yelp.network.model.Category
 import kotlinx.android.synthetic.main.item_category.view.*
 
 class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -17,9 +18,9 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
     private val ITEM = 0
     private val ADD = 1
 
-    private var categories = mutableListOf<String>()
+    private var categories = mutableListOf<Category>()
 
-    fun addItems(newCategory: String) {
+    fun addItem(newCategory: Category) {
         val oldSize = categories.size
         categories.add(0, newCategory)
 
@@ -27,19 +28,31 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
         notifyItemRangeInserted(oldSize, newSize)
     }
 
+    fun addItems(newCategories: List<Category>) {
+        // remove add button
+        categories.removeAt(categories.lastIndex)
+        val distinctCategories = categories.union(newCategories).distinct()
+        categories.clear()
+        categories.addAll(distinctCategories)
+
+        // add again the add button
+        categories.add(Category(alias = ""))
+        notifyDataSetChanged()
+    }
+
     fun clearAdapter() {
         categories.clear()
         notifyDataSetChanged()
     }
 
-    private fun removeItem(item: String) {
+    private fun removeItem(item: Category) {
         val index = categories.indexOf(item)
         categories.removeAt(index)
         notifyItemRemoved(index)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (categories[position].isEmpty()) ADD else ITEM
+        return if (categories[position].alias.isEmpty()) ADD else ITEM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -66,8 +79,8 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var view: View = itemView
 
-        fun bind(item: String) {
-            view.tvCategory.text = item
+        fun bind(item: Category) {
+            view.tvCategory.text = item.title
             view.setOnClickListener {
                 removeItem(item)
             }
