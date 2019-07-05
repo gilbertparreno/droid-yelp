@@ -2,6 +2,8 @@ package com.gp.yelp.screen.main
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,8 +20,8 @@ import com.gp.yelp.network.model.Business
 import com.gp.yelp.screen.base.BaseFragment
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_business_details.*
+import java.util.*
 import javax.inject.Inject
-
 
 class BusinessDetailsFragment : BaseFragment() {
 
@@ -112,6 +114,12 @@ class BusinessDetailsFragment : BaseFragment() {
 
         ViewCompat.setNestedScrollingEnabled(rvReviews, false)
         ViewCompat.setNestedScrollingEnabled(rvOperatingHours, false)
+
+        tvDirections.setOnClickListener {
+            val uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", businessDetails.coordinates.latitude, businessDetails.coordinates.longitude)
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+            startActivity(intent)
+        }
     }
 
     private fun businessDetailsFromNetwork(businessDetails: Business?) {

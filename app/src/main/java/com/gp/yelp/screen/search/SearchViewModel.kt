@@ -27,7 +27,7 @@ class SearchViewModel @Inject constructor(private val placesClient: PlacesClient
     fun search(term: String, northeast: LatLng, southwest: LatLng) {
         val request = FindAutocompletePredictionsRequest.builder()
             .setCountry("ph")
-            .setLocationRestriction(RectangularBounds.newInstance(northeast, southwest))
+//            .setLocationRestriction(RectangularBounds.newInstance(northeast, southwest))
             .setQuery(term)
             .build()
 

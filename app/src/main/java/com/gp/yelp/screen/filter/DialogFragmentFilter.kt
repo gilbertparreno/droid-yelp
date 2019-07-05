@@ -18,12 +18,16 @@ import com.google.gson.reflect.TypeToken
 import com.gp.yelp.R
 import com.gp.yelp.app.App
 import com.gp.yelp.network.model.Category
+import com.gp.yelp.screen.businessList.Settings
 import com.gp.yelp.screen.filter.categoryList.CategoryListFragment
+import com.gp.yelp.screen.main.BusinessListFragment
+import com.gp.yelp.screen.main.SearchFragment
 import com.gp.yelp.utils.BaseDialogFragment
 import com.gp.yelp.utils.ItemOffsetDecoration
 import com.gp.yelp.utils.SharedPreferenceUtil
 import com.gp.yelp.utils.Utils
 import kotlinx.android.synthetic.main.dialog_fragment_filter.*
+import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.toolbar.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -149,13 +153,23 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
             val radioButtonID = rgSortBy.checkedRadioButtonId
             val radioButton = view!!.findViewById<RadioButton>(radioButtonID)
             val rbIndex = rgSortBy.indexOfChild(radioButton)
-            viewModel.saveSettings(SharedPreferenceUtil.Key.SORT_BY, sortAlias[rbIndex])
-            viewModel.saveSettings(SharedPreferenceUtil.Key.OPEN_NOW, cbOpenNow.isChecked)
-            viewModel.saveSettings(SharedPreferenceUtil.Key.RADIUS, sbRadius.progress * 1000)
-            viewModel.saveSettings(SharedPreferenceUtil.Key.CATEGORIES, Gson().toJson(adapter.categories.filter {
+//            filterListener.applyFilter()
+
+            val categories = Gson().toJson(adapter.categories.filter {
                 it.alias.isNotEmpty()
-            }))
-            filterListener.applyFilter()
+            })
+            val settings = Settings(
+                    sortBy = sortAlias[rbIndex],
+                    openNow = cbOpenNow.isChecked,
+                    radius = sbRadius.progress * 1000,
+                    categories = categories)
+
+            val output = Intent()
+            output.putExtra(EXTRA_SETTINGS, settings)
+            val fragment = targetFragment
+            fragment?.onActivityResult(BusinessListFragment.REQUEST_FILTER, Activity.RESULT_OK, output)
+            activity?.supportFragmentManager?.popBackStack()
+
             dismiss()
         }
 
@@ -203,6 +217,7 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
 
     companion object {
         val TAG = "DialogFragmentFilter"
+        val EXTRA_SETTINGS = "settings"
         val EXTRA_CATEGORIES = "categories"
         val REQUEST_CATEGORY = 1
     }

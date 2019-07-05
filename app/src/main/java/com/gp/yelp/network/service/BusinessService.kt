@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface BusinessService {
 
     @GET("businesses/search?limit=20")
-    fun searchBusiness(
+    fun searchBusinessByLatlng(
             @Query("term") term: String?,
             @Query("latitude") lat: Double?,
             @Query("longitude") lng: Double?,
@@ -20,6 +20,15 @@ interface BusinessService {
             @Query("sort_by") sortBy: String?,
             @Query("open_now") openNow: Boolean?,
             @Query("categories") categories: String?): Single<BusinessList>
+
+    @GET("businesses/search?limit=20")
+    fun searchBusinessByByAddress(
+            @Query("term") term: String?,
+            @Query("radius") radius: Int?,
+            @Query("sort_by") sortBy: String?,
+            @Query("open_now") openNow: Boolean?,
+            @Query("categories") categories: String?,
+            @Query("location") location: String?): Single<BusinessList>
 
     @GET("businesses/{id}")
     fun getBusinessById(@Path("id") businessId: String): Single<Business>
