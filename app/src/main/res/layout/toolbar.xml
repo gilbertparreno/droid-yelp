@@ -31,8 +31,8 @@
         app:srcCompat="@drawable/vec_menu_search" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="match_parent"
         android:id="@+id/tvHeader"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:maxLines="1"
@@ -41,6 +41,22 @@
         android:text="Hello World"
         android:textSize="@dimen/text_m"
         android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgHeader"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/mp_quarter"
+        android:layout_marginBottom="@dimen/mp_quarter"
+        android:adjustViewBounds="true"
+        android:paddingLeft="?actionBarSize"
+        android:paddingRight="?actionBarSize"
+        android:src="@drawable/ic_yelp_header"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/toolbarFilter"
@@ -65,5 +81,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/vec_menu_close" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/toolbarDone"
+        android:layout_width="?actionBarSize"
+        android:layout_height="?actionBarSize"
+        android:foreground="?selectableItemBackground"
+        android:padding="@dimen/mp_standard"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vec_done" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,7 +8,8 @@
 
     <color name="defaultTextColor">#0c0c0c</color>
     <color name="subTextColor">#37BBAE</color>
-    <color name="subTextColor_80">#CC37BBAE</color>
+    <color name="subTextColor80">#CC37BBAE</color>
     <color name="secondaryPrimary">#9bdcd7</color>
     <color name="bgButtonContainer">#EAEEF7</color>
+    <color name="colorPrimary30">#3337BAAF</color>
 </resources>
