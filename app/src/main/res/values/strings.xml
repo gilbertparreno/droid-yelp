@@ -45,4 +45,8 @@
     <string name="error_generic">Something went wrong.</string>
 
     <string name="lbl_tap_retry">Tap to Retry</string>
+
+    <string name="lbl_directions">Directions</string>
+    <string name="lbl_operating_hours">Operating Hours</string>
+    <string name="lbl_reviews">Reviews</string>
 </resources>
