@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">base-project</string>
+    <string name="app_name">Droid Yelp</string>
 
     <plurals name="lbl_quantity_reviews_1">
         <item quantity="one">%d Review</item>
@@ -15,7 +15,7 @@
     <string name="lbl_seekbar_radius">%1$d km</string>
 
     <string name="btn_done">Done</string>
-    <string name="btn_apply_filters">Apply Filter/s</string>
+    <string name="btn_apply_filters">Apply Filters</string>
     <string name="lbl_radius">Radius</string>
     <string name="lbl_categories">Categories</string>
 
@@ -43,4 +43,6 @@
     <string name="lbl_address">Address</string>
 
     <string name="error_generic">Something went wrong.</string>
+
+    <string name="lbl_tap_retry">Tap to Retry</string>
 </resources>

@@ -26,13 +26,13 @@ class App : Application() {
         }
 
         appComponent = DaggerAppComponent.builder()
-            .networkModule(
-                NetworkModule(
-                    "https://api.yelp.com/v3/",
-                    "7EQyQ2QZhMRoKBna6YApSqj4iC0IknqAS8coqGmvMdcp2qXNkIfh1Vlm3oUAUNaLyV4KsO8Ld7ItTAmhJvsQiFMWZg6qEZz7qBuLIHMlselO00_ds9vsq9uQwb4ZXXYx", BuildConfig . DEBUG
+                .networkModule(
+                        NetworkModule(applicationContext,
+                                "https://api.yelp.com/v3/",
+                                "7EQyQ2QZhMRoKBna6YApSqj4iC0IknqAS8coqGmvMdcp2qXNkIfh1Vlm3oUAUNaLyV4KsO8Ld7ItTAmhJvsQiFMWZg6qEZz7qBuLIHMlselO00_ds9vsq9uQwb4ZXXYx", BuildConfig.DEBUG
+                        )
                 )
-            )
-            .appModule(AppModule(this))
-            .build()
+                .appModule(AppModule(this))
+                .build()
     }
 }

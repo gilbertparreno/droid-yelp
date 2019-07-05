@@ -22,11 +22,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.gp.yelp.R
 import com.gp.yelp.app.App
-import com.gp.yelp.network.model.*
+import com.gp.yelp.network.model.ApiResponse
+import com.gp.yelp.network.model.Business
+import com.gp.yelp.network.model.BusinessList
+import com.gp.yelp.network.model.Category
 import com.gp.yelp.screen.base.BaseFragment
+import com.gp.yelp.screen.businessList.BusinessListView
 import com.gp.yelp.screen.businessList.Settings
 import com.gp.yelp.screen.filter.DialogFragmentFilter
-import com.gp.yelp.screen.filter.FilterListener
 import com.gp.yelp.utils.DEFAULT_RADIUS
 import com.gp.yelp.utils.DEFAULT_SORT_BY_ALIAS
 import com.gp.yelp.utils.SharedPreferenceUtil
@@ -34,7 +37,7 @@ import kotlinx.android.synthetic.main.fragment_business_list.*
 import javax.inject.Inject
 
 
-class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnItemClickListener {
+class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.OnItemClickListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -60,10 +63,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
         val activity = context as Activity
         let {
             DaggerBusinessListComponent.builder()
-                    .appComponent((activity.application as App).appComponent)
-                    .mainView(activity as MainView)
-                    .businessListModule(BusinessListModule())
-                    .build().inject(this)
+                .appComponent((activity.application as App).appComponent)
+                .mainView(activity as MainView)
+                .businessListModule(BusinessListModule(this))
+                .build().inject(this)
         }
     }
 
@@ -88,12 +91,11 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
         lifecycle.addObserver(viewModel)
         viewModel.liveDataBusinesses.observe(this,
-                Observer<ApiResponse<BusinessList>> { response ->
-                    if (response.throwable == null && response.data != null) {
-                        adapter.clearAdapter()
-                        adapter.addItems(response.data.businesses!!)
-                    }
-                })
+            Observer<ApiResponse<BusinessList>> { response ->
+                if (response.throwable == null && response.data != null) {
+                    adapter.addItems(response.data.businesses!!)
+                }
+            })
 
         viewModel.liveDataPlaceIdtoLatLng.observe(this, Observer { response ->
             if (response.throwable == null) {
@@ -103,8 +105,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
                 }
 
             } else {
-                Toast.makeText(context, response.throwable.message
-                        ?: getString(R.string.error_generic), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context, response.throwable.message
+                        ?: getString(R.string.error_generic), Toast.LENGTH_LONG
+                ).show()
             }
         })
 
@@ -113,30 +117,57 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
         requestPermission()
     }
 
+    override fun clearList() {
+        adapter.clearAdapter()
+    }
+
+    override fun showProgress() {
+        progressAnimation.playAnimation()
+        progressAnimation.visibility = View.VISIBLE
+    }
+
+    override fun hideProgress() {
+        progressAnimation.cancelAnimation()
+        progressAnimation.visibility = View.GONE
+    }
+
+    override fun showError() {
+        hideProgress()
+        errorAnim.playAnimation()
+        errorContainer.visibility = View.VISIBLE
+    }
+
+    override fun hideError() {
+        errorAnim.cancelAnimation()
+        errorContainer.visibility = View.GONE
+    }
+
     private fun requestPermission() {
         if (ContextCompat.checkSelfPermission(
-                        context!!,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-                != PackageManager.PERMISSION_GRANTED
+                context!!,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    REQUEST_ACCESS_COARSE_LOCATION)
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_ACCESS_COARSE_LOCATION
+            )
         } else {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
-                        settings.longitude = location?.longitude
-                        settings.latitude = location?.latitude
+                .addOnSuccessListener { location: Location? ->
+                    settings.longitude = location?.longitude
+                    settings.latitude = location?.latitude
 
-                        viewModel.searchBusiness(settings)
-                    }
+                    viewModel.searchBusiness(settings)
+                }
         }
     }
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>, grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
     ) {
         when (requestCode) {
             REQUEST_ACCESS_COARSE_LOCATION -> {
@@ -154,10 +185,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
     private fun initViews() {
         rvBusiness.layoutManager = LinearLayoutManager(context)
         rvBusiness.adapter = adapter
-    }
 
-    override fun applyFilter() {
-        viewModel.searchBusiness(settings)
+        errorContainer.setOnClickListener {
+            viewModel.searchBusiness(settings)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -165,10 +196,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
         if (requestCode == REQUEST_SEARCH) {
             if (resultCode == Activity.RESULT_OK) {
-                val address = data?.getParcelableExtra<Address>(SearchFragment.EXTRA_ADDRESS)
+                val address = data?.getStringExtra(SearchFragment.EXTRA_ADDRESS)
                 val businessName = data?.getStringExtra(SearchFragment.EXTRA_BUSINESS_NAME)
                 settings.businessName = businessName ?: ""
-                settings.address = address?.name!!
+                settings.address = address ?: ""
                 viewModel.searchBusiness(settings)
             }
         } else if (requestCode == REQUEST_FILTER) {
@@ -181,10 +212,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
                 val listType = object : TypeToken<ArrayList<Category>>() {}.type
                 val cat = Gson().fromJson<List<Category>>(settings.categories, listType)
-                        .toTypedArray()
-                        .joinToString(separator = ",") {
-                            it.alias
-                        }
+                    .toTypedArray()
+                    .joinToString(separator = ",") {
+                        it.alias
+                    }
 
                 this.settings.apply {
                     sortBy = settings.sortBy
@@ -202,7 +233,7 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
             MainActivity.OptionButton.FILTER.id -> {
                 val ft = activity!!.supportFragmentManager.beginTransaction()
                 ft.addToBackStack(DialogFragmentFilter.TAG)
-                val dialogFragment = DialogFragmentFilter(this)
+                val dialogFragment = DialogFragmentFilter()
                 dialogFragment.setTargetFragment(this, REQUEST_FILTER)
                 dialogFragment.show(ft, DialogFragmentFilter.TAG)
             }
@@ -231,14 +262,16 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
         val cat = sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.CATEGORIES, "[]")
         val listType = object : TypeToken<ArrayList<Category>>() {}.type
         val categories = Gson().fromJson<List<Category>>(cat, listType)
-                .toTypedArray()
-                .joinToString(separator = ",") {
-                    it.alias
-                }
-        return Settings(radius = radius,
-                openNow = openNow,
-                sortBy = sortBy,
-                categories = categories)
+            .toTypedArray()
+            .joinToString(separator = ",") {
+                it.alias
+            }
+        return Settings(
+            radius = radius,
+            openNow = openNow,
+            sortBy = sortBy,
+            categories = categories
+        )
     }
 
     companion object {

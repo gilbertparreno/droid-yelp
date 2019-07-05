@@ -5,11 +5,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.gp.yelp.network.model.ApiResponse
 import com.gp.yelp.network.model.BusinessList
 import com.gp.yelp.network.repository.BusinessRepositoryInteractor
+import com.gp.yelp.screen.businessList.BusinessListView
 import com.gp.yelp.screen.businessList.Settings
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-class BusinessListViewModel @Inject constructor(private val businessRepositoryInteractor: BusinessRepositoryInteractor) :
+class BusinessListViewModel @Inject constructor(
+        private val businessRepositoryInteractor: BusinessRepositoryInteractor,
+        private val businessListView: BusinessListView
+) :
         ViewModel(),
         LifecycleObserver {
 
@@ -29,19 +33,40 @@ class BusinessListViewModel @Inject constructor(private val businessRepositoryIn
     }
 
     fun searchBusiness(settings: Settings) {
-
         val searchSingle = if (settings.address.isNotEmpty()) {
-            businessRepositoryInteractor.searchBusinessByByAddress(settings.businessName, settings.radius, settings.sortBy, settings.openNow, settings.categories, settings.address)
+            businessRepositoryInteractor.searchBusinessByByAddress(
+                    settings.businessName,
+                    settings.radius,
+                    settings.sortBy,
+                    settings.openNow,
+                    settings.categories,
+                    settings.address
+            )
         } else {
-            businessRepositoryInteractor.searchBusinessByLatlng(settings.businessName, settings.latitude, settings.longitude, settings.radius, settings.sortBy, settings.openNow, settings.categories)
+            businessRepositoryInteractor.searchBusinessByLatlng(
+                    settings.businessName,
+                    settings.latitude,
+                    settings.longitude,
+                    settings.radius,
+                    settings.sortBy,
+                    settings.openNow,
+                    settings.categories
+            )
         }
 
-        disposable.add(searchSingle
+        disposable.add(searchSingle.doOnSubscribe {
+            businessListView.clearList()
+            businessListView.hideError()
+            businessListView.showProgress()
+        }
                 .subscribe(
                         { data ->
                             liveDataBusinesses.postValue(ApiResponse(data))
+                            businessListView.hideProgress()
                         }, { throwable ->
                     liveDataBusinesses.postValue(ApiResponse(throwable = throwable))
+                    businessListView.hideProgress()
+                    businessListView.showError()
                 }
                 ))
     }
