@@ -10,16 +10,20 @@ import com.gp.yelp.network.model.Business
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_business.view.*
 
-class BusinessAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class BusinessAdapter(val onItemClickListener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(businessesItem: Business)
+    }
 
     private val ITEM = 0
     private val PROGRESS = 1
 
-    private var businessItems = mutableListOf<Business.BusinessesItem>()
+    private var businessItems = mutableListOf<Business>()
 
-    fun addItems(newBusinessItems: List<Business.BusinessesItem>) {
+    fun addItems(newBusinessListItems: List<Business>) {
         val oldSize = businessItems.size
-        businessItems.addAll(newBusinessItems)
+        businessItems.addAll(newBusinessListItems)
 
         val newSize = businessItems.size
         notifyItemRangeInserted(oldSize, newSize)
@@ -51,9 +55,9 @@ class BusinessAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private var view: View = itemView
 
 
-        fun bind(item: Business.BusinessesItem) {
+        fun bind(item: Business) {
 
-            val distance = (item.distance / 1000).toFloat()
+            val distance = (item.distance / 1000)
             var categories: String = item.categories?.joinToString(separator = ", ") {
                 it.title
             } ?: ""
@@ -62,7 +66,7 @@ class BusinessAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             view.rbRating.rating = item.rating
             view.tvReviews.text =
                 view.context.resources.getQuantityString(
-                    R.plurals.lbl_quantity_reviews,
+                    R.plurals.lbl_quantity_reviews_1,
                     item.reviewCount,
                     item.reviewCount
                 )
@@ -71,6 +75,10 @@ class BusinessAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             if (item.imageUrl.isNotEmpty()) {
                 Picasso.get().load(item.imageUrl).resize(640, 360).centerCrop().into(view.imgBusiness)
+            }
+
+            view.setOnClickListener {
+                onItemClickListener.onItemClick(item)
             }
         }
     }

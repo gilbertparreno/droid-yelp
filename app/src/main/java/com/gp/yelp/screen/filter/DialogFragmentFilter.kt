@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.gp.yelp.R
 import com.gp.yelp.app.App
 import com.gp.yelp.network.model.Category
@@ -20,8 +22,10 @@ import com.gp.yelp.screen.filter.categoryList.CategoryListFragment
 import com.gp.yelp.utils.BaseDialogFragment
 import com.gp.yelp.utils.ItemOffsetDecoration
 import com.gp.yelp.utils.SharedPreferenceUtil
+import com.gp.yelp.utils.Utils
 import kotlinx.android.synthetic.main.dialog_fragment_filter.*
 import kotlinx.android.synthetic.main.toolbar.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -36,6 +40,9 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
     private var sortAlias = arrayOf<String>()
     private val rbSortIds = arrayOf(R.id.rbBestMatch, R.id.rbRating, R.id.rbReviewCount, R.id.rbDistance)
     private val adapter = CategoryAdapter(this)
+    private val rawCategoryItems = mutableListOf<Category>()
+
+    private var initLoading = true
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -60,6 +67,14 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
 
         dialogFragment.setTargetFragment(this, REQUEST_CATEGORY)
         dialogFragment.show(ft, CategoryListFragment.TAG)
+    }
+
+    override fun onAdapterChange() {
+        if (!initLoading) {
+            validateEnableButtonApply()
+        }
+
+        initLoading = false
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -89,6 +104,12 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
                     rb.isChecked = true
                 }
             }
+        })
+
+        viewModel.liveDataCategories.observe(viewLifecycleOwner, Observer {
+            val listType = object : TypeToken<ArrayList<Category>>() {}.type
+            rawCategoryItems.addAll(Gson().fromJson<List<Category>>(it, listType))
+            adapter.addItems(rawCategoryItems)
         })
     }
 
@@ -131,6 +152,9 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
             viewModel.saveSettings(SharedPreferenceUtil.Key.SORT_BY, sortAlias[rbIndex])
             viewModel.saveSettings(SharedPreferenceUtil.Key.OPEN_NOW, cbOpenNow.isChecked)
             viewModel.saveSettings(SharedPreferenceUtil.Key.RADIUS, sbRadius.progress * 1000)
+            viewModel.saveSettings(SharedPreferenceUtil.Key.CATEGORIES, Gson().toJson(adapter.categories.filter {
+                it.alias.isNotEmpty()
+            }))
             filterListener.applyFilter()
             dismiss()
         }
@@ -164,7 +188,13 @@ class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDia
 
         val sortByIsSame = sortAlias[rbIndex] == viewModel.liveDataSortBy.value
 
-        if (radiusIsSame && openNowIsSame && sortByIsSame) {
+        val isCategoriesSame = rawCategoryItems.toTypedArray()
+            .contentDeepEquals(
+                adapter.categories.filter {
+                    it.alias.isNotEmpty()
+                }.toTypedArray())
+
+        if (radiusIsSame && openNowIsSame && sortByIsSame && isCategoriesSame) {
             return
         }
 

@@ -12,12 +12,14 @@ class FilterViewModel @Inject constructor(private val sharedPreferenceUtil: Shar
     val liveDataRadius = MutableLiveData<Int>()
     val liveDataOpenNow = MutableLiveData<Boolean>()
     val liveDataSortBy = MutableLiveData<String>()
+    val liveDataCategories = MutableLiveData<String>()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
         liveDataRadius.postValue(sharedPreferenceUtil.getInt(SharedPreferenceUtil.Key.RADIUS, DEFAULT_RADIUS))
         liveDataOpenNow.postValue(sharedPreferenceUtil.getBoolean(SharedPreferenceUtil.Key.OPEN_NOW, false))
         liveDataSortBy.postValue(sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.SORT_BY, DEFAULT_SORT_BY_ALIAS))
+        liveDataCategories.postValue(sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.CATEGORIES, "[]"))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

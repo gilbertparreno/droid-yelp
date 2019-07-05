@@ -1,6 +1,7 @@
 package com.gp.yelp.di
 
 import android.app.Application
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.gp.yelp.app.App
 import com.gp.yelp.utils.SharedPreferenceUtil
 import dagger.Component
@@ -14,4 +15,5 @@ interface AppComponent {
     fun application(): Application
     fun retrofit(): Retrofit
     fun sharedPreferenceUtil() : SharedPreferenceUtil
+    fun placesClient() : PlacesClient
 }

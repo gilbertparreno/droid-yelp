@@ -13,6 +13,7 @@ class SharedPreferenceUtil(context: Context) {
             val RADIUS = "radius"
             val OPEN_NOW = "open_now"
             val SORT_BY = "sort_by"
+            val CATEGORIES = "categories"
         }
     }
 

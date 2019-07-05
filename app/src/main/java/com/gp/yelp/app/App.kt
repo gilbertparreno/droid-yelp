@@ -1,6 +1,7 @@
 package com.gp.yelp.app
 
 import android.app.Application
+import com.google.android.libraries.places.api.Places
 import com.gp.yelp.BuildConfig
 import com.gp.yelp.di.AppComponent
 import com.gp.yelp.di.AppModule
@@ -18,6 +19,10 @@ class App : Application() {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, "AIzaSyAuyVcTdY0fqbWs40DlLyQwPT5jI-f2DT4")
         }
 
         appComponent = DaggerAppComponent.builder()

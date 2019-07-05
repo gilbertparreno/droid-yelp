@@ -13,12 +13,13 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
 
     interface CategoryListener {
         fun addCategory()
+        fun onAdapterChange()
     }
 
     private val ITEM = 0
     private val ADD = 1
 
-    private var categories = mutableListOf<Category>()
+    var categories = mutableListOf<Category>()
 
     fun addItem(newCategory: Category) {
         val oldSize = categories.size
@@ -26,6 +27,8 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
 
         val newSize = categories.size
         notifyItemRangeInserted(oldSize, newSize)
+
+        categoryListener.onAdapterChange()
     }
 
     fun addItems(newCategories: List<Category>) {
@@ -38,17 +41,21 @@ class CategoryAdapter(val categoryListener: CategoryListener) : RecyclerView.Ada
         // add again the add button
         categories.add(Category(alias = ""))
         notifyDataSetChanged()
+
+        categoryListener.onAdapterChange()
     }
 
     fun clearAdapter() {
         categories.clear()
         notifyDataSetChanged()
+        categoryListener.onAdapterChange()
     }
 
     private fun removeItem(item: Category) {
         val index = categories.indexOf(item)
         categories.removeAt(index)
         notifyItemRemoved(index)
+        categoryListener.onAdapterChange()
     }
 
     override fun getItemViewType(position: Int): Int {

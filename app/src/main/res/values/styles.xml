@@ -20,7 +20,7 @@
     </style>
 
     <style name="WidgetTheme" parent="Theme.AppCompat">
-        <item name="android:colorControlNormal">@color/subTextColor_80</item>
+        <item name="android:colorControlNormal">@color/subTextColor80</item>
         <item name="android:colorControlActivated">@color/subTextColor</item>
     </style>
 
