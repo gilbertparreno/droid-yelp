@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_business_details.*
 import java.util.*
 import javax.inject.Inject
 
+
 class BusinessDetailsFragment : BaseFragment() {
 
     @Inject
@@ -118,6 +119,11 @@ class BusinessDetailsFragment : BaseFragment() {
         tvDirections.setOnClickListener {
             val uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?q=loc:%f,%f", businessDetails.coordinates.latitude, businessDetails.coordinates.longitude)
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+            startActivity(intent)
+        }
+
+        animPhone.setOnClickListener {
+            val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", businessDetails.displayPhone, null))
             startActivity(intent)
         }
     }

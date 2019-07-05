@@ -52,6 +52,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation "com.google.dagger:dagger:$dagger_version"
@@ -78,4 +79,6 @@ dependencies {
     testImplementation "android.arch.core:core-testing:1.1.1"
 
     implementation 'com.nex3z:toggle-button-group:1.1.9'
+
+    implementation 'com.airbnb.android:lottie:3.0.7'
 }

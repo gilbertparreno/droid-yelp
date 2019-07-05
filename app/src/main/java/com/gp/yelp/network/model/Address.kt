@@ -1,6 +1,5 @@
 package com.gp.yelp.network.model
 
-import android.location.Location
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 

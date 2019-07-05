@@ -32,16 +32,29 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/mp_standard"
-        android:layout_marginTop="@dimen/mp_half"
         android:layout_marginEnd="@dimen/mp_standard"
         android:ellipsize="end"
-        android:maxLines="1"
+        android:maxLines="2"
         android:textSize="@dimen/text_l"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/animPhone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/animPhone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imgBusiness"
+        app:layout_constraintTop_toTopOf="@id/animPhone"
         tools:text="Meet Lover\'s g" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animPhone"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="@dimen/mp_half"
+        android:layout_marginEnd="@dimen/mp_standard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgBusiness"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/lottie_phone_anim" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvAddress"
@@ -62,21 +75,34 @@
         app:layout_constraintTop_toBottomOf="@id/rbRating"
         tools:text="Description here" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/tvDirections"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/mp_half"
         android:layout_marginEnd="@dimen/mp_standard"
-        android:drawableLeft="@drawable/vec_map"
-        android:drawablePadding="@dimen/mp_half"
-        android:drawableTint="@color/colorPrimary"
-        android:gravity="center_vertical"
-        android:text="Directions"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/text_s"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAddress" />
+        app:layout_constraintTop_toBottomOf="@id/tvAddress">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/lottie_find_in_map_anim" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/mp_half"
+            android:drawableTint="@color/colorPrimary"
+            android:gravity="center_vertical"
+            android:text="Directions"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_s" />
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatRatingBar
         android:id="@+id/rbRating"

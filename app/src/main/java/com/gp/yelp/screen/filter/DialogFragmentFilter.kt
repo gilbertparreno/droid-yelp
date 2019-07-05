@@ -33,7 +33,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
-class DialogFragmentFilter(private val filterListener: FilterListener) : BaseDialogFragment(),
+class DialogFragmentFilter : BaseDialogFragment(),
     CategoryAdapter.CategoryListener {
 
     @Inject

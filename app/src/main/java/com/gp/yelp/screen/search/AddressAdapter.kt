@@ -11,8 +11,12 @@ import kotlinx.android.synthetic.main.item_address.view.*
 import com.gp.yelp.network.model.Address
 
 
-class AddressAdapter :
+class AddressAdapter(val onItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<AddressAdapter.ItemViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(address: Address)
+    }
 
     var addresses = mutableListOf<Address>()
     var selected: Address? = null
@@ -20,8 +24,10 @@ class AddressAdapter :
     fun addItems(newAddresses: List<Address>) {
         if (selected != null) {
             val selectedIndex = addresses.indexOf(selected!!)
-            addresses.removeAt(selectedIndex)
-            notifyItemRemoved(selectedIndex)
+            if (selectedIndex >= 0) {
+                addresses.removeAt(selectedIndex)
+                notifyItemRemoved(selectedIndex)
+            }
         }
 
         val oldSize = addresses.size
@@ -31,6 +37,7 @@ class AddressAdapter :
 
     private fun onSelectItem(address: Address) {
         selected = address
+        onItemClickListener.onItemClick(address)
         notifyDataSetChanged()
     }
 

@@ -36,6 +36,9 @@ class BusinessListViewModelTest {
     @Mock
     lateinit var businessService: BusinessService
 
+    @Mock
+    lateinit var businessListView: BusinessListView
+
     lateinit var businessRepositoryInteractor: BusinessRepositoryInteractor
 
     lateinit var businessListViewModel: BusinessListViewModel
@@ -44,7 +47,7 @@ class BusinessListViewModelTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         businessRepositoryInteractor = BusinessRepositoryInteractorImpl(businessService)
-        this.businessListViewModel = BusinessListViewModel(businessRepositoryInteractor)
+        this.businessListViewModel = BusinessListViewModel(businessRepositoryInteractor, businessListView)
 
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
         RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }

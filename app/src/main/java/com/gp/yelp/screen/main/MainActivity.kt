@@ -19,6 +19,7 @@ class MainActivity : BaseActivity(), MainView {
         ft.replace(R.id.fragmentContainer, dialogFragment, BusinessListFragment.TAG).commit()
 
         supportFragmentManager.addOnBackStackChangedListener {
+            hideKeyboard()
             showToolbar()
             getFragmentForeground()?.setUpToolBar()
         }

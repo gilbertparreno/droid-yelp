@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
 import com.gp.yelp.R
 import com.gp.yelp.app.App
+import com.gp.yelp.network.model.Address
 import com.gp.yelp.screen.base.BaseFragment
 import com.gp.yelp.screen.search.AddressAdapter
 import kotlinx.android.synthetic.main.fragment_search.*
@@ -31,7 +32,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import javax.inject.Inject
 
 
-class SearchFragment : BaseFragment() {
+class SearchFragment : BaseFragment(), AddressAdapter.OnItemClickListener {
 
     @Inject
     lateinit var mainView: MainView
@@ -47,7 +48,7 @@ class SearchFragment : BaseFragment() {
 
     private val REQUEST_ACCESS_COARSE_LOCATION = 1
 
-    private var adapter = AddressAdapter()
+    private var adapter = AddressAdapter(this)
 
     private lateinit var southwest: LatLng
     private lateinit var northeast: LatLng
@@ -174,7 +175,7 @@ class SearchFragment : BaseFragment() {
         when (buttonId) {
             MainActivity.OptionButton.DONE.id -> {
                 val output = Intent()
-                output.putExtra(EXTRA_ADDRESS, adapter.selected)
+                output.putExtra(EXTRA_ADDRESS, etPlaces.text.toString())
                 output.putExtra(EXTRA_BUSINESS_NAME, etBusinessName.text.toString())
                 val fragment = targetFragment
                 fragment?.onActivityResult(BusinessListFragment.REQUEST_SEARCH, Activity.RESULT_OK, output)
@@ -201,5 +202,9 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onItemClick(address: Address) {
+        etPlaces.setText(address.name)
     }
 }
