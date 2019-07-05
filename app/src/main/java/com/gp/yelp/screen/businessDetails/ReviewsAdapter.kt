@@ -54,7 +54,8 @@ class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ItemViewHolder>() {
             view.tvUserName.text = item.user.name
             view.tvReviewText.text = item.text
             view.rbReviewRating.rating = item.rating.toFloat()
-            Picasso.get().load(item.user.imageUrl).transform(CircleTransform()).into(view.imgUserProfilePic)
+            Picasso.get().load(item.user.imageUrl).error(R.drawable.ic_default_user)
+                    .transform(CircleTransform()).into(view.imgUserProfilePic)
             val reviewDate = reviewDateFormat.parse(item.timeCreated)
             view.tvReviewDate.text = dateFormat.format(reviewDate)
         }

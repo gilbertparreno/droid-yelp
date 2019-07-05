@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -108,6 +109,9 @@ class BusinessDetailsFragment : BaseFragment() {
 
         rvOperatingHours.layoutManager = LinearLayoutManager(context)
         rvOperatingHours.adapter = operationTimeAdapter
+
+        ViewCompat.setNestedScrollingEnabled(rvReviews, false)
+        ViewCompat.setNestedScrollingEnabled(rvOperatingHours, false)
     }
 
     private fun businessDetailsFromNetwork(businessDetails: Business?) {
