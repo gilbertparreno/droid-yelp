@@ -12,8 +12,14 @@ import javax.inject.Inject
 class BusinessRepositoryInteractorImpl @Inject constructor(private val businessService: BusinessService) :
         BusinessRepositoryInteractor {
 
-    override fun searchBusiness(term: String?, lat: Double?, lng: Double?, radius: Int?, sortBy: String?, openNow: Boolean?, categories: String?): Single<BusinessList> {
-        return businessService.searchBusiness(term, lat, lng, radius, sortBy, openNow, categories)
+    override fun searchBusinessByLatlng(term: String?, lat: Double?, lng: Double?, radius: Int?, sortBy: String?, openNow: Boolean?, categories: String?): Single<BusinessList> {
+        return businessService.searchBusinessByLatlng(term, lat, lng, radius, sortBy, openNow, categories)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun searchBusinessByByAddress(term: String?, radius: Int?, sortBy: String?, openNow: Boolean?, categories: String?, location: String?): Single<BusinessList> {
+        return businessService.searchBusinessByByAddress(term, radius, sortBy, openNow, categories, location)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

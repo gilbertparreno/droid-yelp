@@ -18,15 +18,18 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.gp.yelp.R
 import com.gp.yelp.app.App
-import com.gp.yelp.network.model.Address
-import com.gp.yelp.network.model.ApiResponse
-import com.gp.yelp.network.model.Business
-import com.gp.yelp.network.model.BusinessList
+import com.gp.yelp.network.model.*
 import com.gp.yelp.screen.base.BaseFragment
+import com.gp.yelp.screen.businessList.Settings
 import com.gp.yelp.screen.filter.DialogFragmentFilter
 import com.gp.yelp.screen.filter.FilterListener
+import com.gp.yelp.utils.DEFAULT_RADIUS
+import com.gp.yelp.utils.DEFAULT_SORT_BY_ALIAS
+import com.gp.yelp.utils.SharedPreferenceUtil
 import kotlinx.android.synthetic.main.fragment_business_list.*
 import javax.inject.Inject
 
@@ -35,6 +38,9 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
 
     @Inject
     lateinit var mainView: MainView
@@ -47,7 +53,7 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
     private val REQUEST_ACCESS_COARSE_LOCATION = 1
 
-    private var location: Location? = null
+    private lateinit var settings: Settings
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -59,7 +65,6 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
                     .businessListModule(BusinessListModule())
                     .build().inject(this)
         }
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,7 +73,7 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        settings = getSettings()
         viewModel = ViewModelProviders.of(this, viewModelFactory)[BusinessListViewModel::class.java]
     }
 
@@ -82,7 +87,7 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
         super.onViewCreated(view, savedInstanceState)
 
         lifecycle.addObserver(viewModel)
-        viewModel.liveDataProjects.observe(this,
+        viewModel.liveDataBusinesses.observe(this,
                 Observer<ApiResponse<BusinessList>> { response ->
                     if (response.throwable == null && response.data != null) {
                         adapter.clearAdapter()
@@ -91,7 +96,13 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
                 })
 
         viewModel.liveDataPlaceIdtoLatLng.observe(this, Observer { response ->
-            if (response.throwable != null) {
+            if (response.throwable == null) {
+                settings = getSettings().apply {
+                    latitude = response.data?.latitude ?: 0.0
+                    longitude = response.data?.longitude ?: 0.0
+                }
+
+            } else {
                 Toast.makeText(context, response.throwable.message
                         ?: getString(R.string.error_generic), Toast.LENGTH_LONG).show()
             }
@@ -115,8 +126,10 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
-                        this.location = location
-                        viewModel.onLocationAvailable(location!!)
+                        settings.longitude = location?.longitude
+                        settings.latitude = location?.latitude
+
+                        viewModel.searchBusiness(settings)
                     }
         }
     }
@@ -144,7 +157,7 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
     }
 
     override fun applyFilter() {
-        viewModel.getProjectList()
+        viewModel.searchBusiness(settings)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -154,7 +167,32 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
             if (resultCode == Activity.RESULT_OK) {
                 val address = data?.getParcelableExtra<Address>(SearchFragment.EXTRA_ADDRESS)
                 val businessName = data?.getStringExtra(SearchFragment.EXTRA_BUSINESS_NAME)
-                viewModel.searchByLatlngAndName(businessName ?: "", address)
+                settings.businessName = businessName ?: ""
+                settings.address = address?.name!!
+                viewModel.searchBusiness(settings)
+            }
+        } else if (requestCode == REQUEST_FILTER) {
+            if (resultCode == Activity.RESULT_OK) {
+                val settings = data?.getParcelableExtra<Settings>(DialogFragmentFilter.EXTRA_SETTINGS)!!
+                sharedPreferenceUtil.write(SharedPreferenceUtil.Key.SORT_BY, settings.sortBy)
+                sharedPreferenceUtil.write(SharedPreferenceUtil.Key.OPEN_NOW, settings.openNow)
+                sharedPreferenceUtil.write(SharedPreferenceUtil.Key.RADIUS, settings.radius)
+                sharedPreferenceUtil.write(SharedPreferenceUtil.Key.CATEGORIES, settings.categories)
+
+                val listType = object : TypeToken<ArrayList<Category>>() {}.type
+                val cat = Gson().fromJson<List<Category>>(settings.categories, listType)
+                        .toTypedArray()
+                        .joinToString(separator = ",") {
+                            it.alias
+                        }
+
+                this.settings.apply {
+                    sortBy = settings.sortBy
+                    openNow = settings.openNow
+                    radius = settings.radius
+                    categories = cat
+                }
+                viewModel.searchBusiness(this.settings)
             }
         }
     }
@@ -165,15 +203,13 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
                 val ft = activity!!.supportFragmentManager.beginTransaction()
                 ft.addToBackStack(DialogFragmentFilter.TAG)
                 val dialogFragment = DialogFragmentFilter(this)
-
+                dialogFragment.setTargetFragment(this, REQUEST_FILTER)
                 dialogFragment.show(ft, DialogFragmentFilter.TAG)
             }
             MainActivity.OptionButton.SEARCH.id -> {
                 val ft = activity!!.supportFragmentManager.beginTransaction()
                 ft.addToBackStack(SearchFragment.TAG)
-                val fragment = SearchFragment.newInstance(
-                        viewModel.businessName ?: "",
-                        if (viewModel.address != null) viewModel.address?.name ?: "" else "")
+                val fragment = SearchFragment.newInstance(settings.businessName, settings.address)
                 fragment.setTargetFragment(this, REQUEST_SEARCH)
                 ft.add(R.id.fragmentContainer, fragment, SearchFragment.TAG).commit()
             }
@@ -188,8 +224,26 @@ class BusinessListFragment : BaseFragment(), FilterListener, BusinessAdapter.OnI
         ft.add(R.id.fragmentContainer, fragment, BusinessDetailsFragment.TAG).commit()
     }
 
+    private fun getSettings(): Settings {
+        val radius = sharedPreferenceUtil.getInt(SharedPreferenceUtil.Key.RADIUS, DEFAULT_RADIUS)
+        val openNow = sharedPreferenceUtil.getBoolean(SharedPreferenceUtil.Key.OPEN_NOW, false)
+        val sortBy = sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.SORT_BY, DEFAULT_SORT_BY_ALIAS)
+        val cat = sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.CATEGORIES, "[]")
+        val listType = object : TypeToken<ArrayList<Category>>() {}.type
+        val categories = Gson().fromJson<List<Category>>(cat, listType)
+                .toTypedArray()
+                .joinToString(separator = ",") {
+                    it.alias
+                }
+        return Settings(radius = radius,
+                openNow = openNow,
+                sortBy = sortBy,
+                categories = categories)
+    }
+
     companion object {
         val TAG = "BusinessListFragment"
         val REQUEST_SEARCH = 2
+        val REQUEST_FILTER = 3
     }
 }
