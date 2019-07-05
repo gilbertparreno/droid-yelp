@@ -1,10 +1,6 @@
 # Yelp Demo App
 Basic implementation of [yelp](https://www.yelp.com/developers/documentation/v3/business) business endpoint api.
 
-## Continues Integration
-* Continuous Integration using CircleCI
-![alt text](https://pasteboard.co/ImBC8en.png)
-
 ## Libraries Used
 - Dependency Injection
 	- [Dagger 2](https://github.com/google/dagger)
@@ -19,3 +15,8 @@ Basic implementation of [yelp](https://www.yelp.com/developers/documentation/v3/
 
 ## Testing
 I  don't think its necessary to use an espresso testing here so I just provide a unit testing on my ViewModels.
+
+
+## Continues Integration
+* Continuous Integration using CircleCi
+![](https://github.com/gilbertparreno/droid-yelp/blob/master/circle%20ci%20test%20results.png)
