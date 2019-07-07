@@ -92,31 +92,19 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         super.onViewCreated(view, savedInstanceState)
 
         lifecycle.addObserver(viewModel)
-        viewModel.liveDataBusinesses.observe(this,
+
+        initViews()
+
+        requestPermission()
+    }
+
+    private fun searchBusinessLiveData() {
+        viewModel.searchBusiness(settings).observe(this,
                 Observer<ApiResponse<BusinessList>> { response ->
                     if (response.throwable == null && response.data != null) {
                         adapter.addItems(response.data.businesses!!)
                     }
                 })
-
-        viewModel.liveDataPlaceIdtoLatLng.observe(this, Observer { response ->
-            if (response.throwable == null) {
-                settings = getSettings().apply {
-                    latitude = response.data?.latitude ?: 0.0
-                    longitude = response.data?.longitude ?: 0.0
-                }
-
-            } else {
-                Toast.makeText(
-                        context, response.throwable.message
-                        ?: getString(R.string.error_generic), Toast.LENGTH_LONG
-                ).show()
-            }
-        })
-
-        initViews()
-
-        requestPermission()
     }
 
     override fun clearList() {
@@ -162,7 +150,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                         settings.longitude = location?.longitude
                         settings.latitude = location?.latitude
 
-                        viewModel.searchBusiness(settings)
+                        searchBusinessLiveData()
                     }
         }
     }
@@ -200,7 +188,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         rvBusiness.adapter = adapter
 
         errorContainer.setOnClickListener {
-            viewModel.searchBusiness(settings)
+            searchBusinessLiveData()
         }
     }
 
@@ -213,7 +201,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                 val businessName = data?.getStringExtra(SearchFragment.EXTRA_BUSINESS_NAME)
                 settings.businessName = businessName ?: ""
                 settings.address = address ?: ""
-                viewModel.searchBusiness(settings)
+                searchBusinessLiveData()
             }
         } else if (requestCode == REQUEST_FILTER) {
             if (resultCode == Activity.RESULT_OK) {
@@ -236,7 +224,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                     radius = settings.radius
                     categories = cat
                 }
-                viewModel.searchBusiness(this.settings)
+                searchBusinessLiveData()
             }
         }
     }
