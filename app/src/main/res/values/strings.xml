@@ -49,4 +49,7 @@
     <string name="lbl_directions">Directions</string>
     <string name="lbl_operating_hours">Operating Hours</string>
     <string name="lbl_reviews">Reviews</string>
+    <string name="error_location_permission">Droid yelp needs location permission.</string>
+    <string name="title_permission_denied">Permission Denied</string>
+    <string name="lbl_retry">Retry</string>
 </resources>
