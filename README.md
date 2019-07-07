@@ -19,4 +19,4 @@ I  don't think its necessary to use an espresso testing here so I just provide a
 
 ## Continues Integration
 * Continuous Integration using CircleCi
-![](https://github.com/gilbertparreno/droid-yelp/blob/master/circle%20ci%20test%20results.png)
+![](https://github.com/gilbertparreno/droid-yelp/blob/master/circle_ci_results.png)
