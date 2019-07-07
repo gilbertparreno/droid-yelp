@@ -20,11 +20,15 @@ class BusinessDetailsViewModel
 
     private val disposable = CompositeDisposable()
 
-    val liveDataBusinessDetails = MutableLiveData<ApiResponse<Pair<Business, Reviews>>>()
+    private val mutableLiveDataBusinessDetails = MutableLiveData<ApiResponse<Pair<Business, Reviews>>>()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
 
+    }
+
+    fun liveDataBusinessDetails(): LiveData<ApiResponse<Pair<Business, Reviews>>> {
+        return mutableLiveDataBusinessDetails
     }
 
     fun getBusinessDetails(businessId: String) {
@@ -34,9 +38,9 @@ class BusinessDetailsViewModel
                         BiFunction<Business, Reviews, Pair<Business, Reviews>> { t1, t2 ->
                             Pair(t1, t2)
                         }).subscribe({
-                    liveDataBusinessDetails.postValue(ApiResponse(it))
+                    mutableLiveDataBusinessDetails.postValue(ApiResponse(it))
                 }, {
-                    liveDataBusinessDetails.postValue(ApiResponse(throwable = it))
+                    mutableLiveDataBusinessDetails.postValue(ApiResponse(throwable = it))
                 })
         )
     }

@@ -1,12 +1,12 @@
 package com.gp.yelp.screen.main
 
 import androidx.lifecycle.*
-import com.google.android.gms.maps.model.LatLng
 import com.gp.yelp.network.model.ApiResponse
 import com.gp.yelp.network.model.BusinessList
 import com.gp.yelp.network.repository.BusinessRepositoryInteractor
 import com.gp.yelp.screen.businessList.BusinessListView
 import com.gp.yelp.screen.businessList.Settings
+import com.gp.yelp.utils.AbsentLiveData
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -19,6 +19,10 @@ class BusinessListViewModel @Inject constructor(
 
     private val disposable = CompositeDisposable()
 
+    var hasLocationPermission = false
+
+    private val businessListMutableLiveData = MutableLiveData<ApiResponse<BusinessList>>()
+
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
 
@@ -29,8 +33,9 @@ class BusinessListViewModel @Inject constructor(
         disposable.clear()
     }
 
-    fun searchBusiness(settings: Settings): LiveData<ApiResponse<BusinessList>> {
-        val mutableLiveData = MutableLiveData<ApiResponse<BusinessList>>()
+    fun getBusinessListLiveData(): LiveData<ApiResponse<BusinessList>> = businessListMutableLiveData
+
+    fun searchBusiness(settings: Settings) {
         val searchSingle = if (settings.address.isNotEmpty()) {
             businessRepositoryInteractor.searchBusinessByByAddress(
                     settings.businessName,
@@ -59,15 +64,13 @@ class BusinessListViewModel @Inject constructor(
         }
                 .subscribe(
                         { data ->
-                            mutableLiveData.postValue(ApiResponse(data))
+                            businessListMutableLiveData.postValue(ApiResponse(data))
                             businessListView.hideProgress()
                         }, { throwable ->
-                    mutableLiveData.postValue(ApiResponse(throwable = throwable))
+                    businessListMutableLiveData.postValue(ApiResponse(throwable = throwable))
                     businessListView.hideProgress()
                     businessListView.showError()
                 }
                 ))
-
-        return mutableLiveData
     }
 }
