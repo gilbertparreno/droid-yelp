@@ -2,7 +2,9 @@ package com.gp.yelp.screen.main
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -63,10 +65,10 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         val activity = context as Activity
         let {
             DaggerBusinessListComponent.builder()
-                .appComponent((activity.application as App).appComponent)
-                .mainView(activity as MainView)
-                .businessListModule(BusinessListModule(this))
-                .build().inject(this)
+                    .appComponent((activity.application as App).appComponent)
+                    .mainView(activity as MainView)
+                    .businessListModule(BusinessListModule(this))
+                    .build().inject(this)
         }
     }
 
@@ -90,31 +92,19 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         super.onViewCreated(view, savedInstanceState)
 
         lifecycle.addObserver(viewModel)
-        viewModel.liveDataBusinesses.observe(this,
-            Observer<ApiResponse<BusinessList>> { response ->
-                if (response.throwable == null && response.data != null) {
-                    adapter.addItems(response.data.businesses!!)
-                }
-            })
-
-        viewModel.liveDataPlaceIdtoLatLng.observe(this, Observer { response ->
-            if (response.throwable == null) {
-                settings = getSettings().apply {
-                    latitude = response.data?.latitude ?: 0.0
-                    longitude = response.data?.longitude ?: 0.0
-                }
-
-            } else {
-                Toast.makeText(
-                    context, response.throwable.message
-                        ?: getString(R.string.error_generic), Toast.LENGTH_LONG
-                ).show()
-            }
-        })
 
         initViews()
 
         requestPermission()
+    }
+
+    private fun searchBusinessLiveData() {
+        viewModel.searchBusiness(settings).observe(this,
+                Observer<ApiResponse<BusinessList>> { response ->
+                    if (response.throwable == null && response.data != null) {
+                        adapter.addItems(response.data.businesses!!)
+                    }
+                })
     }
 
     override fun clearList() {
@@ -144,38 +134,49 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
 
     private fun requestPermission() {
         if (ContextCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
+                        context!!,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                REQUEST_ACCESS_COARSE_LOCATION
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                    REQUEST_ACCESS_COARSE_LOCATION
             )
         } else {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
             fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    settings.longitude = location?.longitude
-                    settings.latitude = location?.latitude
+                    .addOnSuccessListener { location: Location? ->
+                        settings.longitude = location?.longitude
+                        settings.latitude = location?.latitude
 
-                    viewModel.searchBusiness(settings)
-                }
+                        searchBusinessLiveData()
+                    }
         }
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<String>, grantResults: IntArray
     ) {
         when (requestCode) {
             REQUEST_ACCESS_COARSE_LOCATION -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     requestPermission()
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    val builder = AlertDialog.Builder(context, R.style.MyDialogTheme)
+                    builder.setMessage(R.string.error_location_permission)
+                            .setPositiveButton(R.string.lbl_retry
+                            ) { dialog, _ ->
+                                requestPermission()
+                                dialog.dismiss()
+                            }
+                            .setNegativeButton(android.R.string.cancel
+                            ) { dialog, _ ->
+                                activity?.finish()
+                                dialog.dismiss()
+                            }
+                    builder.create().show()
                 }
                 return
             }
@@ -187,7 +188,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         rvBusiness.adapter = adapter
 
         errorContainer.setOnClickListener {
-            viewModel.searchBusiness(settings)
+            searchBusinessLiveData()
         }
     }
 
@@ -200,7 +201,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                 val businessName = data?.getStringExtra(SearchFragment.EXTRA_BUSINESS_NAME)
                 settings.businessName = businessName ?: ""
                 settings.address = address ?: ""
-                viewModel.searchBusiness(settings)
+                searchBusinessLiveData()
             }
         } else if (requestCode == REQUEST_FILTER) {
             if (resultCode == Activity.RESULT_OK) {
@@ -212,10 +213,10 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
 
                 val listType = object : TypeToken<ArrayList<Category>>() {}.type
                 val cat = Gson().fromJson<List<Category>>(settings.categories, listType)
-                    .toTypedArray()
-                    .joinToString(separator = ",") {
-                        it.alias
-                    }
+                        .toTypedArray()
+                        .joinToString(separator = ",") {
+                            it.alias
+                        }
 
                 this.settings.apply {
                     sortBy = settings.sortBy
@@ -223,7 +224,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                     radius = settings.radius
                     categories = cat
                 }
-                viewModel.searchBusiness(this.settings)
+                searchBusinessLiveData()
             }
         }
     }
@@ -262,15 +263,15 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         val cat = sharedPreferenceUtil.getString(SharedPreferenceUtil.Key.CATEGORIES, "[]")
         val listType = object : TypeToken<ArrayList<Category>>() {}.type
         val categories = Gson().fromJson<List<Category>>(cat, listType)
-            .toTypedArray()
-            .joinToString(separator = ",") {
-                it.alias
-            }
+                .toTypedArray()
+                .joinToString(separator = ",") {
+                    it.alias
+                }
         return Settings(
-            radius = radius,
-            openNow = openNow,
-            sortBy = sortBy,
-            categories = categories
+                radius = radius,
+                openNow = openNow,
+                sortBy = sortBy,
+                categories = categories
         )
     }
 

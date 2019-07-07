@@ -17,9 +17,6 @@ class BusinessListViewModel @Inject constructor(
         ViewModel(),
         LifecycleObserver {
 
-    val liveDataBusinesses = MutableLiveData<ApiResponse<BusinessList>>()
-    val liveDataPlaceIdtoLatLng = MutableLiveData<ApiResponse<LatLng>>()
-
     private val disposable = CompositeDisposable()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -32,7 +29,8 @@ class BusinessListViewModel @Inject constructor(
         disposable.clear()
     }
 
-    fun searchBusiness(settings: Settings) {
+    fun searchBusiness(settings: Settings): LiveData<ApiResponse<BusinessList>> {
+        val mutableLiveData = MutableLiveData<ApiResponse<BusinessList>>()
         val searchSingle = if (settings.address.isNotEmpty()) {
             businessRepositoryInteractor.searchBusinessByByAddress(
                     settings.businessName,
@@ -61,13 +59,15 @@ class BusinessListViewModel @Inject constructor(
         }
                 .subscribe(
                         { data ->
-                            liveDataBusinesses.postValue(ApiResponse(data))
+                            mutableLiveData.postValue(ApiResponse(data))
                             businessListView.hideProgress()
                         }, { throwable ->
-                    liveDataBusinesses.postValue(ApiResponse(throwable = throwable))
+                    mutableLiveData.postValue(ApiResponse(throwable = throwable))
                     businessListView.hideProgress()
                     businessListView.showError()
                 }
                 ))
+
+        return mutableLiveData
     }
 }

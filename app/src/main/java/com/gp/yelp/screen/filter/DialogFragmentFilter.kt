@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.SeekBar
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -21,23 +20,20 @@ import com.gp.yelp.network.model.Category
 import com.gp.yelp.screen.businessList.Settings
 import com.gp.yelp.screen.filter.categoryList.CategoryListFragment
 import com.gp.yelp.screen.main.BusinessListFragment
-import com.gp.yelp.screen.main.SearchFragment
-import com.gp.yelp.utils.BaseDialogFragment
-import com.gp.yelp.utils.ItemOffsetDecoration
-import com.gp.yelp.utils.SharedPreferenceUtil
-import com.gp.yelp.utils.Utils
+import com.gp.yelp.utils.*
 import kotlinx.android.synthetic.main.dialog_fragment_filter.*
-import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.toolbar.*
-import timber.log.Timber
 import javax.inject.Inject
 
 
 class DialogFragmentFilter : BaseDialogFragment(),
-    CategoryAdapter.CategoryListener {
+        CategoryAdapter.CategoryListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    @Inject
+    lateinit var sharedPreferenceUtil: SharedPreferenceUtil
 
     private lateinit var viewModel: FilterViewModel
 
@@ -54,9 +50,9 @@ class DialogFragmentFilter : BaseDialogFragment(),
 
         let {
             DaggerFilterComponent.builder()
-                .appComponent((activity.application as App).appComponent)
-                .build()
-                .inject(this)
+                    .appComponent((activity.application as App).appComponent)
+                    .build()
+                    .inject(this)
         }
     }
 
@@ -89,39 +85,28 @@ class DialogFragmentFilter : BaseDialogFragment(),
         viewModel = ViewModelProviders.of(this, viewModelFactory)[FilterViewModel::class.java]
         lifecycle.addObserver(viewModel)
 
-        viewModel.liveDataRadius.observe(viewLifecycleOwner, Observer {
-            sbRadius.progress = it / 1000
-            tvRadiusValue.text = resources.getString(R.string.lbl_seekbar_radius, it / 1000)
-        })
+        sbRadius.progress = viewModel.settings.radius / 1000
+        tvRadiusValue.text = resources.getString(R.string.lbl_seekbar_radius, (viewModel.settings.radius / 1000))
 
-        viewModel.liveDataOpenNow.observe(viewLifecycleOwner, Observer {
-            cbOpenNow.isChecked = it
-            tvOpenNowValue.text = if (it) "Open Only" else "All"
-        })
+        cbOpenNow.isChecked = viewModel.settings.openNow
+        tvOpenNowValue.text = if (viewModel.settings.openNow) "Open Only" else "All"
 
-        viewModel.liveDataSortBy.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()) {
-                rbBestMatch.isChecked = true
-            } else {
-                val index = sortAlias.indexOf(it)
-                view?.findViewById<RadioButton>(rbSortIds[index])!!.let { rb ->
-                    rb.isChecked = true
-                }
-            }
-        })
+        if (viewModel.settings.sortBy.isEmpty()) {
+            rbBestMatch.isChecked = true
+        } else {
+            val index = sortAlias.indexOf(viewModel.settings.sortBy)
+            view?.findViewById<RadioButton>(rbSortIds[index])!!.isChecked = true
+        }
 
-        viewModel.liveDataCategories.observe(viewLifecycleOwner, Observer {
-            val listType = object : TypeToken<ArrayList<Category>>() {}.type
-            rawCategoryItems.addAll(Gson().fromJson<List<Category>>(it, listType))
-            adapter.addItems(rawCategoryItems)
-        })
+        val listType = object : TypeToken<ArrayList<Category>>() {}.type
+        rawCategoryItems.addAll(Gson().fromJson<List<Category>>(viewModel.settings.categories, listType))
+        adapter.addItems(rawCategoryItems)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         sortAlias = resources.getStringArray(R.array.sort_alias)
-        initViewModel()
 
         toolbarClose.visibility = View.VISIBLE
         tvHeader.text = "Filters"
@@ -151,13 +136,13 @@ class DialogFragmentFilter : BaseDialogFragment(),
 
         btnApply.setOnClickListener {
             val radioButtonID = rgSortBy.checkedRadioButtonId
-            val radioButton = view!!.findViewById<RadioButton>(radioButtonID)
+            val radioButton = view.findViewById<RadioButton>(radioButtonID)
             val rbIndex = rgSortBy.indexOfChild(radioButton)
-//            filterListener.applyFilter()
 
             val categories = Gson().toJson(adapter.categories.filter {
                 it.alias.isNotEmpty()
             })
+
             val settings = Settings(
                     sortBy = sortAlias[rbIndex],
                     openNow = cbOpenNow.isChecked,
@@ -189,24 +174,25 @@ class DialogFragmentFilter : BaseDialogFragment(),
         rvCategories.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
         rvCategories.adapter = adapter
         adapter.addItem(Category(alias = ""))
+        initViewModel()
     }
 
     private fun validateEnableButtonApply() {
         btnApply.isEnabled = false
-        val radiusIsSame = (sbRadius.progress * 1000) == viewModel.liveDataRadius.value
-        val openNowIsSame = cbOpenNow.isChecked == viewModel.liveDataOpenNow.value
+        val radiusIsSame = (sbRadius.progress * 1000) == viewModel.settings.radius
+        val openNowIsSame = cbOpenNow.isChecked == viewModel.settings.openNow
 
         val radioButtonID = rgSortBy.checkedRadioButtonId
         val radioButton = view!!.findViewById<RadioButton>(radioButtonID)
         val rbIndex = rgSortBy.indexOfChild(radioButton)
 
-        val sortByIsSame = sortAlias[rbIndex] == viewModel.liveDataSortBy.value
+        val sortByIsSame = sortAlias[rbIndex] == viewModel.settings.sortBy
 
         val isCategoriesSame = rawCategoryItems.toTypedArray()
-            .contentDeepEquals(
-                adapter.categories.filter {
-                    it.alias.isNotEmpty()
-                }.toTypedArray())
+                .contentDeepEquals(
+                        adapter.categories.filter {
+                            it.alias.isNotEmpty()
+                        }.toTypedArray())
 
         if (radiusIsSame && openNowIsSame && sortByIsSame && isCategoriesSame) {
             return
