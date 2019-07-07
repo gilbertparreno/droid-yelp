@@ -61,8 +61,6 @@ class BusinessDetailsFragment : BaseFragment() {
         }
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)[BusinessDetailsViewModel::class.java]
-
-        viewModel.getBusinessDetails(businessDetails.id)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -79,7 +77,7 @@ class BusinessDetailsFragment : BaseFragment() {
 
         initViews()
 
-        viewModel.liveDataBusinessDetails.observe(viewLifecycleOwner, Observer { response ->
+        viewModel.liveDataBusinessDetails().observe(viewLifecycleOwner, Observer { response ->
             if (response.throwable == null) {
                 reviewsAdapter.addItems(response.data?.second?.reviews ?: listOf())
                 businessDetailsFromNetwork(response.data?.first)
@@ -87,6 +85,7 @@ class BusinessDetailsFragment : BaseFragment() {
                 Toast.makeText(context!!, "Something went wrong", Toast.LENGTH_LONG).show()
             }
         })
+        viewModel.getBusinessDetails(businessDetails.id)
     }
 
     private fun initViews() {

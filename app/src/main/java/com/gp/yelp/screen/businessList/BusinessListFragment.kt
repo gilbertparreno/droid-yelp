@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -12,7 +11,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +34,7 @@ import com.gp.yelp.utils.DEFAULT_RADIUS
 import com.gp.yelp.utils.DEFAULT_SORT_BY_ALIAS
 import com.gp.yelp.utils.SharedPreferenceUtil
 import kotlinx.android.synthetic.main.fragment_business_list.*
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -78,8 +77,11 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         settings = getSettings()
-        viewModel = ViewModelProviders.of(this, viewModelFactory)[BusinessListViewModel::class.java]
+        viewModel = activity?.run {
+            ViewModelProviders.of(this, viewModelFactory)[BusinessListViewModel::class.java]
+        } ?: throw Exception("Invalid activity")
     }
 
     override fun setUpToolBar() {
@@ -94,17 +96,24 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
         lifecycle.addObserver(viewModel)
 
         initViews()
+        attachObservers()
 
-        requestPermission()
+        if (!viewModel.hasLocationPermission) {
+            requestPermission()
+        }
     }
 
-    private fun searchBusinessLiveData() {
-        viewModel.searchBusiness(settings).observe(this,
+    private fun attachObservers() {
+        viewModel.getBusinessListLiveData().observe(this,
                 Observer<ApiResponse<BusinessList>> { response ->
                     if (response.throwable == null && response.data != null) {
                         adapter.addItems(response.data.businesses!!)
                     }
                 })
+    }
+
+    private fun searchBusinessLiveData() {
+        viewModel.searchBusiness(settings)
     }
 
     override fun clearList() {
@@ -118,7 +127,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
 
     override fun hideProgress() {
         progressAnimation.cancelAnimation()
-        progressAnimation.visibility = View.GONE
+        progressAnimation?.visibility = View.GONE
     }
 
     override fun showError() {
@@ -150,6 +159,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                         settings.longitude = location?.longitude
                         settings.latitude = location?.latitude
 
+                        viewModel.hasLocationPermission = true
                         searchBusinessLiveData()
                     }
         }

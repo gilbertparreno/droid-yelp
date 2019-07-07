@@ -69,13 +69,13 @@ class BusinessListViewModelTest {
                 }
 
         val observer = mock(Observer::class.java) as Observer<ApiResponse<BusinessList>>
-        this.businessListViewModel.liveDataBusinesses.observeForever(observer)
+        this.businessListViewModel.getBusinessListLiveData().observeForever(observer)
 
         this.businessListViewModel.searchBusiness(settings)
 
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value)
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value?.data)
-        assertNull(this.businessListViewModel.liveDataBusinesses.value?.throwable)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value?.data)
+        assertNull(this.businessListViewModel.getBusinessListLiveData().value?.throwable)
     }
 
     @Test
@@ -93,13 +93,13 @@ class BusinessListViewModelTest {
                 }
 
         val observer = mock(Observer::class.java) as Observer<ApiResponse<BusinessList>>
-        this.businessListViewModel.liveDataBusinesses.observeForever(observer)
+        this.businessListViewModel.getBusinessListLiveData().observeForever(observer)
 
         this.businessListViewModel.searchBusiness(settings)
 
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value)
-        assertNull(this.businessListViewModel.liveDataBusinesses.value?.data)
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value?.throwable)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value)
+        assertNull(this.businessListViewModel.getBusinessListLiveData().value?.data)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value?.throwable)
     }
 
     @Test
@@ -119,13 +119,13 @@ class BusinessListViewModelTest {
                 }
 
         val observer = mock(Observer::class.java) as Observer<ApiResponse<BusinessList>>
-        this.businessListViewModel.liveDataBusinesses.observeForever(observer)
+        this.businessListViewModel.getBusinessListLiveData().observeForever(observer)
 
         this.businessListViewModel.searchBusiness(settings)
 
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value)
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value?.data)
-        assertNull(this.businessListViewModel.liveDataBusinesses.value?.throwable)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value?.data)
+        assertNull(this.businessListViewModel.getBusinessListLiveData().value?.throwable)
     }
 
     @Test
@@ -144,12 +144,12 @@ class BusinessListViewModelTest {
                 }
 
         val observer = mock(Observer::class.java) as Observer<ApiResponse<BusinessList>>
-        this.businessListViewModel.liveDataBusinesses.observeForever(observer)
+        this.businessListViewModel.getBusinessListLiveData().observeForever(observer)
 
         this.businessListViewModel.searchBusiness(settings)
 
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value)
-        assertNull(this.businessListViewModel.liveDataBusinesses.value?.data)
-        assertNotNull(this.businessListViewModel.liveDataBusinesses.value?.throwable)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value)
+        assertNull(this.businessListViewModel.getBusinessListLiveData().value?.data)
+        assertNotNull(this.businessListViewModel.getBusinessListLiveData().value?.throwable)
     }
 }
