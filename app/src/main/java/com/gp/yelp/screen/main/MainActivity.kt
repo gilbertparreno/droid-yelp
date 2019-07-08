@@ -28,8 +28,7 @@ class MainActivity : BaseActivity(), MainView {
             val backStackEntry = supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1)
             val fragment = supportFragmentManager.findFragmentByTag(backStackEntry.name)
             if (fragment != null) {
-                fragment as BaseFragment
-                fragment.setUpToolBar()
+                (fragment as BaseFragment).setUpToolBar()
             }
         }
 
