@@ -36,7 +36,7 @@ class BusinessListViewModel @Inject constructor(
     fun getBusinessListLiveData(): LiveData<ApiResponse<BusinessList>> = businessListMutableLiveData
 
     fun searchBusiness(settings: Settings) {
-        val searchSingle = if (settings.address.isNotEmpty()) {
+        val searchSingle = if (settings.address.trim().isNotEmpty()) {
             businessRepositoryInteractor.searchBusinessByByAddress(
                     settings.businessName,
                     settings.radius,

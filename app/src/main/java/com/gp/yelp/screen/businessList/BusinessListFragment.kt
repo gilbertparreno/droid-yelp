@@ -72,6 +72,7 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        retainInstance = true
         return inflater.inflate(R.layout.fragment_business_list, container, false)
     }
 
@@ -237,6 +238,10 @@ class BusinessListFragment : BaseFragment(), BusinessListView, BusinessAdapter.O
                 searchBusinessLiveData()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     override fun onToolbarClicked(buttonId: Int) {

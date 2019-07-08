@@ -71,6 +71,7 @@ class SearchFragment : BaseFragment(), AddressAdapter.OnItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        retainInstance = true
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
