@@ -7,16 +7,31 @@ import com.gp.yelp.R
 import com.gp.yelp.screen.base.BaseActivity
 import com.gp.yelp.screen.base.BaseFragment
 import kotlinx.android.synthetic.main.toolbar.*
+import timber.log.Timber
 
 class MainActivity : BaseActivity(), MainView {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val ft = supportFragmentManager.beginTransaction()
-        ft.addToBackStack(BusinessListFragment.TAG)
-        val dialogFragment = BusinessListFragment()
-        ft.replace(R.id.fragmentContainer, dialogFragment, BusinessListFragment.TAG).commit()
+        if (savedInstanceState == null) {
+            val ft = supportFragmentManager.beginTransaction()
+            ft.addToBackStack(BusinessListFragment.TAG)
+            val fragment = BusinessListFragment()
+            ft.add(R.id.fragmentContainer, fragment, BusinessListFragment.TAG).commit()
+        } else {
+            val backStackEntryCount = supportFragmentManager.backStackEntryCount
+            if (backStackEntryCount == 0)
+                return
+
+            val backStackEntry = supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1)
+            val fragment = supportFragmentManager.findFragmentByTag(backStackEntry.name)
+            if (fragment != null) {
+                fragment as BaseFragment
+                fragment.setUpToolBar()
+            }
+        }
 
         supportFragmentManager.addOnBackStackChangedListener {
             hideKeyboard()
